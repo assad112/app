@@ -22,29 +22,55 @@ class ProfileController extends AsyncNotifier<DriverProfile> {
         .updateDriverLocally(profile);
   }
 
+  Future<void> _applyMutation(Future<DriverProfile> Function() mutation) async {
+    final previousProfile = state.valueOrNull;
+    state = const AsyncLoading();
+
+    try {
+      final profile = await mutation();
+      state = AsyncData(profile);
+      await ref
+          .read(authControllerProvider.notifier)
+          .updateDriverLocally(profile);
+    } catch (error, stackTrace) {
+      if (previousProfile != null) {
+        state = AsyncData(previousProfile);
+      } else {
+        state = AsyncError(error, stackTrace);
+      }
+      rethrow;
+    }
+  }
+
   Future<void> setAvailability({
     required bool online,
     required bool busy,
   }) async {
-    final profile = await ref
-        .read(profileRepositoryProvider)
-        .updateAvailability(
-          status: online ? 'online' : 'offline',
-          availability: busy ? 'busy' : 'available',
-        );
-    state = AsyncData(profile);
-    await ref
-        .read(authControllerProvider.notifier)
-        .updateDriverLocally(profile);
+    await _applyMutation(
+      () => ref.read(profileRepositoryProvider).updateAvailability(
+        status: online ? 'online' : 'offline',
+        availability: busy ? 'busy' : 'available',
+      ),
+    );
   }
 
   Future<void> updateInventory(List<String> availableCylinderSizes) async {
-    final profile = await ref
-        .read(profileRepositoryProvider)
-        .updateInventory(availableCylinderSizes: availableCylinderSizes);
-    state = AsyncData(profile);
-    await ref
-        .read(authControllerProvider.notifier)
-        .updateDriverLocally(profile);
+    await _applyMutation(
+      () => ref
+          .read(profileRepositoryProvider)
+          .updateInventory(availableCylinderSizes: availableCylinderSizes),
+    );
+  }
+
+  Future<void> updateDispatchPreferences({
+    required String dispatchScopeType,
+    double? maxDispatchDistanceKm,
+  }) async {
+    await _applyMutation(
+      () => ref.read(profileRepositoryProvider).updateDispatchPreferences(
+        dispatchScopeType: dispatchScopeType,
+        maxDispatchDistanceKm: maxDispatchDistanceKm,
+      ),
+    );
   }
 }

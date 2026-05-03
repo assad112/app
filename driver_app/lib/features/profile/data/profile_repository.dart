@@ -46,4 +46,21 @@ class ProfileRepository {
     );
     return DriverProfile.fromJson(payload);
   }
+
+  Future<DriverProfile> updateDispatchPreferences({
+    required String dispatchScopeType,
+    double? maxDispatchDistanceKm,
+  }) async {
+    final response = await _dio.patch<Map<String, dynamic>>(
+      '/driver/dispatch-preferences',
+      data: {
+        'dispatchScopeType': dispatchScopeType,
+        'maxDispatchDistanceKm': maxDispatchDistanceKm,
+      },
+    );
+    final payload = Map<String, dynamic>.from(
+      response.data?['driver'] as Map? ?? const {},
+    );
+    return DriverProfile.fromJson(payload);
+  }
 }

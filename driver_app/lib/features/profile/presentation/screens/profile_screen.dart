@@ -9,6 +9,7 @@ import 'package:driver_app/features/orders/presentation/screens/order_history_sc
 import 'package:driver_app/features/profile/presentation/profile_controller.dart';
 import 'package:driver_app/shared/widgets/language_switcher.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -24,7 +25,7 @@ class ProfileScreen extends ConsumerWidget {
     final strings = context.strings;
     final textTheme = Theme.of(context).textTheme;
     final profileState = ref.watch(profileControllerProvider);
-    final isSavingInventory = profileState.isLoading;
+    final isSavingProfile = profileState.isLoading;
     final lastLocationLabel = driver?.currentLocation.isNotEmpty == true
         ? driver!.currentLocation
         : (driver?.currentLatitude != null && driver?.currentLongitude != null)
@@ -44,6 +45,137 @@ class ProfileScreen extends ConsumerWidget {
     Future<void> refreshAll() async {
       await ref.read(authControllerProvider.notifier).refreshDriver();
       await ref.read(homeControllerProvider.notifier).refreshSilently();
+    }
+
+    Future<void> showMessage(String message) async {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    Future<double?> promptDispatchDistance() async {
+      final initialDistance = driver?.maxDispatchDistanceKm;
+      final controller = TextEditingController(
+        text: initialDistance == null
+            ? ''
+            : _formatEditableDistance(initialDistance),
+      );
+      String? validationMessage;
+
+      final result = await showDialog<double>(
+        context: context,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (dialogContext, setDialogState) {
+              void applyPreset(double value) {
+                controller.text = _formatEditableDistance(value);
+                setDialogState(() {
+                  validationMessage = null;
+                });
+              }
+
+              void submit() {
+                final parsedValue = double.tryParse(controller.text.trim());
+
+                if (parsedValue == null || parsedValue <= 0) {
+                  setDialogState(() {
+                    validationMessage = strings.dispatchDistanceRequired;
+                  });
+                  return;
+                }
+
+                Navigator.of(dialogContext).pop(parsedValue);
+              }
+
+              return AlertDialog(
+                title: Text(strings.dispatchDistanceDialogTitle),
+                content: SizedBox(
+                  width: 380,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        strings.dispatchDistanceDialogSubtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final preset in const [3, 5, 8, 10, 12, 15, 20])
+                            ActionChip(
+                              label: Text(strings.kilometers(preset.toDouble())),
+                              onPressed: () => applyPreset(preset.toDouble()),
+                              backgroundColor: AppColors.surfaceAlt,
+                              side: BorderSide(
+                                color: AppColors.primary.withValues(alpha: 0.12),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: controller,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        ],
+                        decoration: InputDecoration(
+                          labelText: strings.dispatchDistanceInputLabel,
+                          hintText: strings.dispatchDistanceInputHint,
+                          errorText: validationMessage,
+                          suffixText: strings.kilometerShort,
+                        ),
+                        onSubmitted: (_) => submit(),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: Text(
+                      MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed: submit,
+                    child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+
+      controller.dispose();
+      return result;
+    }
+
+    Future<void> saveDispatchPreferences({
+      required String dispatchScopeType,
+      double? maxDispatchDistanceKm,
+    }) async {
+      try {
+        await ref
+            .read(profileControllerProvider.notifier)
+            .updateDispatchPreferences(
+              dispatchScopeType: dispatchScopeType,
+              maxDispatchDistanceKm: maxDispatchDistanceKm,
+            );
+        await refreshAll();
+        if (!context.mounted) return;
+        await showMessage(strings.dispatchPreferencesSaved);
+      } catch (error) {
+        if (!context.mounted) return;
+        await showMessage(_friendlyErrorMessage(error));
+      }
     }
 
     return Scaffold(
@@ -109,7 +241,7 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Row(
                       children: [
@@ -257,7 +389,9 @@ class ProfileScreen extends ConsumerWidget {
                           ? strings.onlineReadyMessage
                           : strings.offlineReadyMessage,
                       value: driver?.isOnline == true,
-                      onChanged: (value) async {
+                      onChanged: isSavingProfile
+                          ? null
+                          : (value) async {
                         await ref
                             .read(profileControllerProvider.notifier)
                             .setAvailability(
@@ -276,7 +410,9 @@ class ProfileScreen extends ConsumerWidget {
                           ? strings.currentStatus
                           : strings.availability,
                       value: driver?.isBusy == true,
-                      onChanged: (value) async {
+                      onChanged: isSavingProfile
+                          ? null
+                          : (value) async {
                         await ref
                             .read(profileControllerProvider.notifier)
                             .setAvailability(
@@ -290,16 +426,143 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              _SectionCard(
+                title: strings.dispatchPreferencesTitle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFF5F9FF),
+                            Color(0xFFEDF4FF),
+                            Color(0xFFFFFBF4),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 46,
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.tune_rounded,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  strings.dispatchPreferencesSubtitle,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    height: 1.45,
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          _DispatchModeOptionCard(
+                            label: strings.dispatchWilayahOnly,
+                            caption: strings.dispatchWilayahOnlySubtitle,
+                            selected:
+                                driver?.dispatchScopeType != 'wilayah_with_distance',
+                            icon: Icons.map_outlined,
+                            enabled: !isSavingProfile,
+                            onTap: () => saveDispatchPreferences(
+                              dispatchScopeType: 'wilayah_only',
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _DispatchModeOptionCard(
+                            label: strings.dispatchWilayahWithDistance,
+                            caption: strings.dispatchWilayahWithDistanceSubtitle,
+                            selected:
+                                driver?.dispatchScopeType == 'wilayah_with_distance',
+                            icon: Icons.radar_rounded,
+                            enabled: !isSavingProfile,
+                            onTap: () async {
+                              final selectedDistance =
+                                  await promptDispatchDistance();
+                              if (selectedDistance == null) {
+                                return;
+                              }
+
+                              await saveDispatchPreferences(
+                                dispatchScopeType: 'wilayah_with_distance',
+                                maxDispatchDistanceKm: selectedDistance,
+                              );
+                            },
+                          ),
+                          if (driver?.usesDistanceDispatchScope == true) ...[
+                            const SizedBox(height: 14),
+                            _DispatchDistanceSummaryCard(
+                              label: strings.dispatchDistanceLabel,
+                              value: driver?.maxDispatchDistanceKm == null
+                                  ? strings.dispatchDistanceUnset
+                                  : strings.kilometers(
+                                      driver!.maxDispatchDistanceKm!,
+                                    ),
+                              buttonLabel: driver?.maxDispatchDistanceKm == null
+                                  ? strings.setDistance
+                                  : strings.editDistance,
+                              busy: isSavingProfile,
+                              onPressed: () async {
+                                final selectedDistance =
+                                    await promptDispatchDistance();
+                                if (selectedDistance == null) {
+                                  return;
+                                }
+
+                                await saveDispatchPreferences(
+                                  dispatchScopeType: 'wilayah_with_distance',
+                                  maxDispatchDistanceKm: selectedDistance,
+                                );
+                              },
+                            ),
+                          ],
+                          if (isSavingProfile) ...[
+                            const SizedBox(height: 12),
+                            Text(
+                              strings.dispatchPreferencesSaving,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
               // ── Account details ───────────────────────────
               _SectionCard(
                 title: strings.isArabic
                     ? 'مخزون الأسطوانات'
                     : 'Cylinder inventory',
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
@@ -376,7 +639,7 @@ class ProfileScreen extends ConsumerWidget {
                                     size,
                                   ) ==
                                   true,
-                              enabled: !isSavingInventory,
+                              enabled: !isSavingProfile,
                               onTap: () async {
                                 final currentSizes = List<String>.from(
                                   driver?.availableCylinderSizes ?? const [],
@@ -435,7 +698,7 @@ class ProfileScreen extends ConsumerWidget {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          if (isSavingInventory) ...[
+                          if (isSavingProfile) ...[
                             const SizedBox(height: 10),
                             Text(
                               strings.isArabic
@@ -610,6 +873,213 @@ String _cylinderCaption(AppStrings strings, String size) {
   }
 
   return size;
+}
+
+String _formatEditableDistance(double value) {
+  final roundedValue = value.roundToDouble();
+
+  if ((value - roundedValue).abs() < 0.001) {
+    return roundedValue.toStringAsFixed(0);
+  }
+
+  return value.toStringAsFixed(1);
+}
+
+String _friendlyErrorMessage(Object error) {
+  final message = error.toString().trim();
+  const dioPrefix = 'DioException [unknown]: ';
+
+  if (message.startsWith(dioPrefix)) {
+    return message.substring(dioPrefix.length).trim();
+  }
+
+  return message;
+}
+
+class _DispatchModeOptionCard extends StatelessWidget {
+  const _DispatchModeOptionCard({
+    required this.label,
+    required this.caption,
+    required this.selected,
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final String label;
+  final String caption;
+  final bool selected;
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 180),
+      opacity: enabled ? 1 : 0.7,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(18),
+          child: Ink(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: selected ? Colors.white : Colors.white.withValues(alpha: 0.74),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: selected
+                    ? AppColors.primary.withValues(alpha: 0.4)
+                    : AppColors.border,
+                width: selected ? 1.6 : 1,
+              ),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: selected
+                          ? [
+                              AppColors.primary.withValues(alpha: 0.18),
+                              AppColors.info.withValues(alpha: 0.14),
+                            ]
+                          : [AppColors.surfaceAlt, AppColors.surfaceAlt],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: selected
+                        ? AppColors.primaryDark
+                        : AppColors.textTertiary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        caption,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Icon(
+                  selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: selected ? AppColors.primaryDark : AppColors.textTertiary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DispatchDistanceSummaryCard extends StatelessWidget {
+  const _DispatchDistanceSummaryCard({
+    required this.label,
+    required this.value,
+    required this.buttonLabel,
+    required this.busy,
+    required this.onPressed,
+  });
+
+  final String label;
+  final String value;
+  final String buttonLabel;
+  final bool busy;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.social_distance_rounded,
+              color: AppColors.warning,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          OutlinedButton(
+            onPressed: busy ? null : onPressed,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, 52),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            child: Text(buttonLabel),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _InventoryOptionCard extends StatelessWidget {
@@ -917,7 +1387,7 @@ class _SwitchTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   @override
   Widget build(BuildContext context) {

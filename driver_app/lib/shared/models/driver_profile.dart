@@ -12,6 +12,8 @@ class DriverProfile {
     required this.vehicleLabel,
     required this.licenseNumber,
     required this.availableCylinderSizes,
+    required this.dispatchScopeType,
+    required this.maxDispatchDistanceKm,
     required this.lastSeenAt,
     required this.lastLocationAt,
   });
@@ -28,11 +30,15 @@ class DriverProfile {
   final String vehicleLabel;
   final String licenseNumber;
   final List<String> availableCylinderSizes;
+  final String dispatchScopeType;
+  final double? maxDispatchDistanceKm;
   final DateTime? lastSeenAt;
   final DateTime? lastLocationAt;
 
   bool get isOnline => status == "online";
   bool get isBusy => availability == "busy";
+  bool get usesDistanceDispatchScope =>
+      dispatchScopeType == "wilayah_with_distance";
 
   DriverProfile copyWith({
     String? id,
@@ -47,10 +53,13 @@ class DriverProfile {
     String? vehicleLabel,
     String? licenseNumber,
     List<String>? availableCylinderSizes,
+    String? dispatchScopeType,
+    double? maxDispatchDistanceKm,
     DateTime? lastSeenAt,
     DateTime? lastLocationAt,
     bool clearLastSeenAt = false,
     bool clearLastLocationAt = false,
+    bool clearMaxDispatchDistanceKm = false,
   }) {
     return DriverProfile(
       id: id ?? this.id,
@@ -66,6 +75,10 @@ class DriverProfile {
       licenseNumber: licenseNumber ?? this.licenseNumber,
       availableCylinderSizes:
           availableCylinderSizes ?? this.availableCylinderSizes,
+      dispatchScopeType: dispatchScopeType ?? this.dispatchScopeType,
+      maxDispatchDistanceKm: clearMaxDispatchDistanceKm
+          ? null
+          : (maxDispatchDistanceKm ?? this.maxDispatchDistanceKm),
       lastSeenAt: clearLastSeenAt ? null : (lastSeenAt ?? this.lastSeenAt),
       lastLocationAt: clearLastLocationAt
           ? null
@@ -109,6 +122,14 @@ class DriverProfile {
       return const [];
     }
 
+    double? parseDistance(dynamic value) {
+      if (value == null || value == "") {
+        return null;
+      }
+
+      return double.tryParse(value.toString());
+    }
+
     return DriverProfile(
       id: (json["id"] ?? "").toString(),
       name: (json["name"] ?? "").toString(),
@@ -132,6 +153,14 @@ class DriverProfile {
       availableCylinderSizes: parseCylinderSizes(
         json["availableCylinderSizes"] ?? json["available_cylinder_sizes"],
       ),
+      dispatchScopeType:
+          (json["dispatchScopeType"] ??
+                  json["dispatch_scope_type"] ??
+                  "wilayah_only")
+              .toString(),
+      maxDispatchDistanceKm: parseDistance(
+        json["maxDispatchDistanceKm"] ?? json["max_dispatch_distance_km"],
+      ),
       lastSeenAt: parseDate(json["lastSeenAt"] ?? json["last_seen_at"]),
       lastLocationAt: parseDate(
         json["lastLocationAt"] ?? json["last_location_at"],
@@ -153,6 +182,8 @@ class DriverProfile {
       "vehicleLabel": vehicleLabel,
       "licenseNumber": licenseNumber,
       "availableCylinderSizes": availableCylinderSizes,
+      "dispatchScopeType": dispatchScopeType,
+      "maxDispatchDistanceKm": maxDispatchDistanceKm,
       "lastSeenAt": lastSeenAt?.toIso8601String(),
       "lastLocationAt": lastLocationAt?.toIso8601String(),
     };

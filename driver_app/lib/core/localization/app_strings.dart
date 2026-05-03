@@ -186,6 +186,48 @@ class AppStrings {
   String get noSyncYet => isArabic ? 'لم تتم مزامنة بعد' : 'No sync yet';
   String get onlineMode => isArabic ? 'وضع الاتصال' : 'Online mode';
   String get busyMode => isArabic ? 'وضع الانشغال' : 'Busy mode';
+  String get dispatchPreferencesTitle =>
+      isArabic ? 'نطاق استقبال الطلبات' : 'Order reach preferences';
+  String get dispatchPreferencesSubtitle => isArabic
+      ? 'اختر هل تستقبل الطلبات من كامل الولاية أو ضمن مسافة محددة من موقعك الحالي.'
+      : 'Choose whether to receive orders from the whole wilayat or only within a distance from your live location.';
+  String get dispatchWilayahOnly =>
+      isArabic ? 'الولاية فقط' : 'Wilayat only';
+  String get dispatchWilayahOnlySubtitle => isArabic
+      ? 'أي طلب داخل نفس الولاية يمكن أن يصلك بغض النظر عن بعده.'
+      : 'Any order inside your current wilayat can reach you regardless of distance.';
+  String get dispatchWilayahWithDistance =>
+      isArabic ? 'الولاية + مسافة' : 'Wilayat + distance';
+  String get dispatchWilayahWithDistanceSubtitle => isArabic
+      ? 'استقبل الطلبات داخل نفس الولاية لكن ضمن مسافة تحددها أنت.'
+      : 'Receive orders inside the same wilayat only when they fall within your preferred range.';
+  String get dispatchDistanceLabel =>
+      isArabic ? 'المسافة الحالية' : 'Current distance';
+  String get dispatchDistanceUnset => isArabic
+      ? 'لم يتم تحديد المسافة بعد'
+      : 'Distance not set yet';
+  String get editDistance => isArabic ? 'تعديل المسافة' : 'Edit distance';
+  String get setDistance => isArabic ? 'تحديد المسافة' : 'Set distance';
+  String get dispatchDistanceDialogTitle =>
+      isArabic ? 'تحديد مسافة الاستقبال' : 'Set delivery reach';
+  String get dispatchDistanceDialogSubtitle => isArabic
+      ? 'حدد أقصى مسافة تريد أن تصلك منها الطلبات داخل نفس الولاية.'
+      : 'Choose the maximum distance from which orders can be offered to you inside the same wilayat.';
+  String get dispatchDistanceInputLabel =>
+      isArabic ? 'المسافة بالكيلومتر' : 'Distance in kilometers';
+  String get dispatchDistanceInputHint =>
+      isArabic ? 'مثال: 8 أو 12.5' : 'Example: 8 or 12.5';
+  String get dispatchDistanceRequired => isArabic
+      ? 'أدخل مسافة صالحة أكبر من صفر.'
+      : 'Enter a valid distance greater than zero.';
+  String get dispatchPreferencesSaved => isArabic
+      ? 'تم تحديث نطاق استقبال الطلبات'
+      : 'Order reach preferences updated';
+  String get dispatchPreferencesSaving =>
+      isArabic ? 'جارٍ حفظ نطاق الاستقبال...' : 'Saving order reach...';
+  String kilometers(double value) => isArabic
+      ? '${_formatCompactNumber(value)} كم'
+      : '${_formatCompactNumber(value)} km';
   String get license => isArabic ? 'الرخصة' : 'License';
   String get lastLocation => isArabic ? 'آخر موقع' : 'Last location';
   String get notAssignedYet => isArabic ? 'غير مخصص بعد' : 'Not assigned yet';
@@ -212,6 +254,15 @@ class AppStrings {
   String get markArrived => isArabic ? 'تم الوصول' : 'Mark arrived';
   String get completeDelivery =>
       isArabic ? 'إكمال التوصيل' : 'Complete delivery';
+}
+
+String _formatCompactNumber(double value) {
+  final roundedValue = value.roundToDouble();
+  if ((value - roundedValue).abs() < 0.001) {
+    return roundedValue.toStringAsFixed(0);
+  }
+
+  return value.toStringAsFixed(1);
 }
 
 extension AppStringsContext on BuildContext {
