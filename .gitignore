@@ -1,0 +1,28 @@
+# Flutter build outputs
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+
+# macOS
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flutter generated
+**/lib/generated_plugin_registrant.dart

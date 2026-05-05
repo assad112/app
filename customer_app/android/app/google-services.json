@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888043366370",
+    "project_id": "ogas-941c4",
+    "storage_bucket": "ogas-941c4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888043366370:android:915ae12e4aecadfae0bbbb",
+        "android_client_info": {
+          "package_name": "com.omangas.customer_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaXHVWXLx8UfnERxx-W3bm_xKZGVt7SdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

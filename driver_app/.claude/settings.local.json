@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/HP/AndroidStudioProjects/customer_app/**)",
+      "Bash(flutter analyze:*)"
+    ]
+  }
+}
