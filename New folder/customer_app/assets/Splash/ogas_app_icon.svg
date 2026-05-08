@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="orangeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="230" fill="url(#orangeBg)"/>
+  
+  <!-- Cylinder centered -->
+  <g transform="translate(512, 460)">
+    <!-- Handle (curved metal handle) -->
+    <path d="M -90 -260 Q -90 -360 0 -360 Q 90 -360 90 -260" fill="none" stroke="#FFFFFF" stroke-width="25" stroke-linecap="round"/>
+    <!-- Valve square -->
+    <rect x="-32" y="-310" width="64" height="72" fill="#FFFFFF" rx="8"/>
+    <!-- Neck/collar -->
+    <path d="M -82 -228 L -82 -196 L 82 -196 L 82 -228 Z" fill="#FFFFFF"/>
+    <!-- Top shoulder ring -->
+    <rect x="-155" y="-196" width="310" height="50" rx="16" fill="#FFFFFF"/>
+    <!-- Main body -->
+    <rect x="-155" y="-146" width="310" height="340" rx="24" fill="#FFFFFF"/>
+    <!-- Inner shadow line for depth -->
+    <rect x="-155" y="-146" width="32" height="340" fill="#FED7AA" opacity="0.5"/>
+    <!-- Decorative band -->
+    <rect x="-155" y="-15" width="310" height="24" fill="#EA580C"/>
+    <!-- Base ring -->
+    <rect x="-172" y="194" width="344" height="40" rx="12" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- OGAS text at bottom -->
+  <text x="512" y="850" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="110" font-weight="bold" letter-spacing="15">OGAS</text>
+</svg>

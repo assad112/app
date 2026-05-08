@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" width="160" height="200">
+  <!-- Body (smaller) -->
+  <rect x="50" y="60" width="60" height="120" rx="6" fill="#F97316"/>
+  <!-- Top dome -->
+  <path d="M 50 66 Q 50 40 80 40 Q 110 40 110 66 L 110 76 L 50 76 Z" fill="#F97316"/>
+  <!-- Handle -->
+  <path d="M 64 40 Q 64 22 80 22 Q 96 22 96 40" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"/>
+  <!-- Valve -->
+  <rect x="75" y="26" width="10" height="16" fill="#7C2D12" rx="2"/>
+  <!-- Base -->
+  <rect x="46" y="178" width="68" height="12" rx="2" fill="#7C2D12"/>
+  <!-- Brand label background -->
+  <rect x="50" y="92" width="60" height="24" fill="#FFFFFF"/>
+  <!-- Size label background -->
+  <rect x="50" y="138" width="60" height="26" fill="#FED7AA"/>
+</svg>

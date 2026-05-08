@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تقرير حالة مشروع Oman Gas Driver</title>
+    <link rel="stylesheet" href="./project-status-report.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">تقرير مشروع | Oman Gas Driver</span>
+            <h1>تقرير محدث عن حالة مشروع تطبيق السائق</h1>
+            <p>
+              هذا التقرير يعرض الحالة الفعلية الحالية لمشروع
+              <strong>driver_app</strong> بعد آخر التحديثات المنفذة، مع توضيح
+              ما تم إنجازه، ما يزال ناقصًا، وما الذي اكتمل تحديدًا في قسم
+              الخرائط والتنقل والاستقرار على الهاتف الحقيقي.
+            </p>
+            <div class="hero-meta">
+              <span class="pill">تاريخ التحديث: 2026-03-30</span>
+              <span class="pill">المنصة: Flutter Driver App</span>
+              <span class="pill">الحالة العامة: نسخة داخلية مستقرة</span>
+            </div>
+          </div>
+
+          <aside class="snapshot-panel">
+            <h2>ملخص تنفيذي سريع</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="label">الميزات الأساسية</span>
+                <span class="value">8</span>
+              </div>
+              <div class="stat-card">
+                <span class="label">التكاملات النشطة</span>
+                <span class="value">API + Socket + Maps</span>
+              </div>
+              <div class="stat-card">
+                <span class="label">الحالة الحالية</span>
+                <span class="value">جيد جدًا</span>
+              </div>
+              <div class="stat-card">
+                <span class="label">أهم ما ينقص</span>
+                <span class="value">FCM + Route حقيقي</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <div class="main-grid">
+        <main>
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>1. نظرة عامة على المشروع</h2>
+                <p>
+                  التطبيق مخصص لعمليات السائق اليومية: تسجيل الدخول، استقبال
+                  الطلبات، قبول الطلب أو رفضه، تتبع الطلب النشط، تحديث المراحل،
+                  مشاركة الموقع الحي، مراجعة الأرباح، ومتابعة التنبيهات.
+                </p>
+              </div>
+              <span class="badge info">Flutter + Riverpod + Dio + Socket.IO</span>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-box">
+                <strong>المصادقة</strong>
+                <span>جلسة آمنة مع توكن مخزن محليًا وإعادة تحميل بيانات السائق</span>
+              </div>
+              <div class="summary-box">
+                <strong>الطلبات</strong>
+                <span>طلبات متاحة ونشطة وسجل مع تحديثات حية من الخادم</span>
+              </div>
+              <div class="summary-box">
+                <strong>التتبع</strong>
+                <span>خريطة داخلية ومشاركة موقع وتنقل خارجي أكثر استقرارًا</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>2. آخر التحديثات المنفذة</h2>
+                <p>
+                  هذه النقاط تم تنفيذها مؤخرًا فعلًا وأصبحت جزءًا من النسخة
+                  الحالية.
+                </p>
+              </div>
+              <span class="badge success">تم التحديث</span>
+            </div>
+
+            <div class="update-grid">
+              <article class="update-card">
+                <span class="badge info">تحسين خرائط</span>
+                <h3>خدمة خرائط مركزية أكثر احترافية</h3>
+                <p>
+                  تم إنشاء خدمة موحدة لفتح الخرائط بدل الاعتماد على رابط Google
+                  واحد فقط، مع إدارة أفضل لفتح الوجهة والتنقل.
+                </p>
+              </article>
+
+              <article class="update-card">
+                <span class="badge success">استقرار أعلى</span>
+                <h3>دعم Fallbacks متعددة عند فتح الملاحة</h3>
+                <p>
+                  التطبيق يحاول الآن أكثر من صيغة مدعومة حسب النظام مثل
+                  <code>google.navigation</code> و<code>geo:</code> وخرائط Apple
+                  وروابط Google العامة.
+                </p>
+              </article>
+
+              <article class="update-card">
+                <span class="badge warning">معالجة أخطاء</span>
+                <h3>تحقق من الإحداثيات قبل الإطلاق</h3>
+                <p>
+                  تم منع فتح الخرائط بإحداثيات غير صالحة مثل القيم الفارغة أو
+                  <code>0,0</code> أو أي إحداثيات خارج النطاق الصحيح.
+                </p>
+              </article>
+
+              <article class="update-card">
+                <span class="badge info">UX</span>
+                <h3>رسائل واضحة عند فشل فتح الخرائط</h3>
+                <p>
+                  بدل الفشل الصامت أو الرمي الخام للأخطاء، تعرض الشاشة الآن رسالة
+                  مناسبة للمستخدم إذا لم تتوفر الوجهة أو لم يوجد تطبيق خرائط
+                  مدعوم.
+                </p>
+              </article>
+
+              <article class="update-card">
+                <span class="badge success">اتصال الهاتف الحقيقي</span>
+                <h3>إصلاح الاتصال على الأجهزة الفعلية</h3>
+                <p>
+                  تم استبدال عنوان المحاكي بعنوان الشبكة المحلي في بيئة التطوير،
+                  مع رفع مهلة الاتصال لتقليل مشاكل
+                  <code>Dio connection timeout</code>.
+                </p>
+              </article>
+
+              <article class="update-card">
+                <span class="badge success">جاهزية تطوير</span>
+                <h3>التحقق من البناء والتحليل</h3>
+                <p>
+                  تم التأكد من أن ملفات الخرائط الجديدة وشاشة التوصيل تمر عبر
+                  <code>flutter analyze</code> بدون مشاكل.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>3. ما تم إنجازه</h2>
+                <p>الأجزاء المنفذة داخل التطبيق والتي تعمل حاليًا بشكل فعلي.</p>
+              </div>
+              <span class="badge success">منجز</span>
+            </div>
+
+            <div class="timeline">
+              <article class="timeline-item">
+                <h4>أ. نظام الدخول والجلسة</h4>
+                <ul>
+                  <li>تسجيل دخول السائق عبر API وربط مباشر مع بيانات الحساب الحالية.</li>
+                  <li>تخزين التوكن وبيانات السائق محليًا باستخدام تخزين آمن.</li>
+                  <li>إعادة تهيئة الجلسة عند فتح التطبيق إذا كانت الجلسة ما زالت صالحة.</li>
+                  <li>تسجيل الخروج ومسح الجلسة وإغلاق الاتصال اللحظي.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>ب. الصفحة الرئيسية ولوحة البيانات</h4>
+                <ul>
+                  <li>إظهار حالة السائق: متصل أو غير متصل، متاح أو مشغول.</li>
+                  <li>عرض بطاقات الطلبات المتاحة والنشطة والمكتملة وربح اليوم.</li>
+                  <li>توفير تنقل سريع إلى الأرباح والسجل والتوصيل النشط.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>ج. إدارة الطلبات</h4>
+                <ul>
+                  <li>تحميل الطلبات المتاحة والطلبات النشطة وسجل الطلبات.</li>
+                  <li>عرض تفاصيل الطلب مع بيانات العميل والعنوان والمبلغ والملاحظات.</li>
+                  <li>قبول الطلب ورفضه وتحديث مراحله حتى التسليم.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>د. التحديثات الحية Realtime</h4>
+                <ul>
+                  <li>ربط Socket.IO مع التوكن الخاص بالسائق.</li>
+                  <li>استقبال الطلبات والتحديثات الجديدة فورًا.</li>
+                  <li>تحديث القوائم والتنبيهات ولوحة البيانات عند وصول الأحداث.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>هـ. الملف الشخصي والتوفر</h4>
+                <ul>
+                  <li>عرض بيانات السائق الأساسية والمركبة والرخصة وآخر مزامنة.</li>
+                  <li>التحكم في وضع الاتصال والتوفر من داخل التطبيق.</li>
+                  <li>تبديل اللغة بين العربية والإنجليزية من الواجهة.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>و. الأرباح والتنبيهات</h4>
+                <ul>
+                  <li>ملخص أرباح اليوم والأسبوع والشهر والإجمالي.</li>
+                  <li>ربط شاشة الأرباح مع الطلبات المكتملة في السجل.</li>
+                  <li>عرض التنبيهات القادمة من API والتحديثات الحية.</li>
+                </ul>
+              </article>
+
+              <article class="timeline-item">
+                <h4>ز. الخرائط والتنقل</h4>
+                <ul>
+                  <li>عرض خريطة Google داخل شاشة التوصيل النشط.</li>
+                  <li>إظهار موقع العميل وموقع السائق عند توفر البيانات.</li>
+                  <li>فتح التنقل الخارجي عبر أكثر من fallback بدل الاعتماد على صيغة واحدة.</li>
+                  <li>عرض رسائل واضحة عند تعذر فتح الملاحة.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>4. التقييم الوظيفي الحالي</h2>
+                <p>تقدير تقريبي لحالة كل محور داخل التطبيق بعد التحديثات الأخيرة.</p>
+              </div>
+            </div>
+
+            <div class="progress-group">
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>المصادقة والجلسة</strong>
+                  <span>92%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 92%"></div></div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>قوائم الطلبات والتفاصيل</strong>
+                  <span>88%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 88%"></div></div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>التحديثات الحية Socket</strong>
+                  <span>84%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 84%"></div></div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>الملف الشخصي والتوفر</strong>
+                  <span>86%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 86%"></div></div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>الأرباح والتنبيهات</strong>
+                  <span>81%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 81%"></div></div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-header">
+                  <strong>الخريطة والتتبع الحي</strong>
+                  <span>74%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" style="width: 74%"></div></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>5. ما هو ناقص أو غير مكتمل</h2>
+                <p>هذه الجوانب لا تزال تحتاج إكمال قبل اعتبار المشروع جاهزًا إنتاجيًا بالكامل.</p>
+              </div>
+              <span class="badge warning">بحاجة إكمال</span>
+            </div>
+
+            <div class="list-grid">
+              <article class="list-card">
+                <h4>الإشعارات الحقيقية</h4>
+                <ul>
+                  <li>بنية الإشعارات موجودة، لكن Firebase Cloud Messaging لم يكتمل Native بعد.</li>
+                  <li>ما زالت ملفات اعتماد Firebase النهائية غير مثبتة داخل المشروع.</li>
+                  <li>الإشعارات الحالية تعمل من داخل التطبيق وليس كـ push system notification مكتملة.</li>
+                </ul>
+              </article>
+
+              <article class="list-card">
+                <h4>الإطلاق النهائي</h4>
+                <ul>
+                  <li>إعدادات <strong>release signing</strong> غير مكتملة بعد.</li>
+                  <li>مفتاح خرائط Google الإنتاجي النهائي لم يثبت رسميًا بعد.</li>
+                  <li>التطبيق ما زال مضبوطًا على بيئة تطوير محلية وليس بيئة إنتاجية ثابتة.</li>
+                </ul>
+              </article>
+
+              <article class="list-card">
+                <h4>الخادم والبيانات</h4>
+                <ul>
+                  <li>بعض payloads القادمة من الباكند، خصوصًا الإحداثيات، ليست موحدة بالكامل.</li>
+                  <li>التطبيق فيه fallbacks جيدة، لكن الأفضل توحيد شكل البيانات من المصدر.</li>
+                  <li>لا توجد شاشة داخلية لاختيار الخادم أو بيئة التشغيل من داخل التطبيق.</li>
+                </ul>
+              </article>
+
+              <article class="list-card">
+                <h4>تجربة الخرائط الاحترافية</h4>
+                <ul>
+                  <li>الملاحة ما زالت خارجية وليست turn-by-turn داخل التطبيق نفسه.</li>
+                  <li>لا يوجد route حقيقي مبني على الطرق، بل عرض بصري تقريبي فقط.</li>
+                  <li>الـ ETA الحالي تقديري وليس مبنيًا على Directions API أو المرور الحقيقي.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h2>6. حالة الخرائط والتتبع الحي</h2>
+                <p>هذا القسم محدث بناءً على آخر تحسينات ميزة الخرائط والتنقل.</p>
+              </div>
+              <span class="badge info">قسم الخرائط</span>
+            </div>
+
+            <div class="map-status">
+              <div class="map-highlight">
+                <h4>ما اكتمل حاليًا في الخرائط</h4>
+                <ul class="note-list">
+                  <li>عرض الخريطة داخل شاشة التوصيل النشط مع Marker للعميل والسائق.</li>
+                  <li>إرسال موقع السائق إلى الخادم بشكل دوري مع تقليل الإرسال غير الضروري.</li>
+                  <li>التحقق من الإحداثيات قبل محاولة فتح الملاحة.</li>
+                  <li>فتح الملاحة عبر أكثر من fallback مناسب لكل نظام.</li>
+                  <li>الرجوع إلى العنوان النصي عندما لا تتوفر إحداثيات دقيقة.</li>
+                  <li>إظهار رسالة للمستخدم عند فشل فتح الخرائط أو غياب الوجهة.</li>
+                </ul>
+              </div>
+
+              <div class="map-grid">
+                <article class="list-card">
+                  <h4>ما لم يكتمل بعد داخل الخرائط</h4>
+                  <ul>
+                    <li>الخط المعروض بين السائق والعميل ليس Route حقيقي من طرق المدينة.</li>
+                    <li>لا يوجد تكامل مع Google Directions API أو مزود مسارات فعلي.</li>
+                    <li>لا توجد إعادة تمركز ذكية للكاميرا أثناء الحركة.</li>
+                    <li>لا يوجد اختيار يدوي من المستخدم بين تطبيقات الخرائط مثل Waze وGoogle Maps من واجهة داخلية.</li>
+                  </ul>
+                </article>
+
+                <article class="list-card">
+                  <h4>ما يعتمد على الباكند أو المفاتيح</h4>
+                  <ul>
+                    <li>إذا لم تصل إحداثيات العميل من الخادم، تنتقل الملاحة إلى fallback يعتمد على العنوان فقط.</li>
+                    <li>ما زال مفتاح الخرائط النهائي غير مثبت إنتاجيًا.</li>
+                    <li>لا يوجد Route optimization أو ETA حقيقي من جهة الخدمة الخلفية حتى الآن.</li>
+                  </ul>
+                </article>
+              </div>
+
+              <div class="status-list">
+                <div class="status-row">
+                  <span class="status-dot success"></span>
+                  <div>
+                    <strong>مكتمل جزئيًا: فتح الموقع والتنقل</strong>
+                    <p>أصبح فتح الخرائط أكثر ثباتًا بفضل خدمة مركزية متعددة البدائل بدل الاعتماد على رابط واحد.</p>
+                  </div>
+                </div>
+
+                <div class="status-row">
+                  <span class="status-dot success"></span>
+                  <div>
+                    <strong>مكتمل: معالجة فشل فتح الخرائط</strong>
+                    <p>التطبيق يعرض الآن رسالة واضحة إذا لم توجد وجهة صالحة أو لم يتوفر تطبيق خرائط مناسب.</p>
+                  </div>
+                </div>
+
+                <div class="status-row">
+                  <span class="status-dot warning"></span>
+                  <div>
+                    <strong>غير مكتمل: Route حقيقي وETA احترافي</strong>
+                    <p>ما زال المسار المعروض تقديريًا، والوقت المتوقع للوصول غير مبني على خدمة Directions فعلية.</p>
+                  </div>
+                </div>
+
+                <div class="status-row">
+                  <span class="status-dot danger"></span>
+                  <div>
+                    <strong>ناقص للإطلاق: مفتاح الخرائط والإعدادات النهائية</strong>
+                    <p>لا بد من تثبيت مفاتيح الإنتاج النهائية وإعداد النشر الرسمي قبل الإطلاق الفعلي.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <aside>
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h3>7. البنية التقنية</h3>
+                <p>ملخص سريع للتقنيات المستخدمة حاليًا داخل المشروع.</p>
+              </div>
+            </div>
+
+            <div class="status-list">
+              <div class="status-row">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>الواجهة</strong>
+                  <p>Flutter Material مع دعم عربي/إنجليزي وتنسيق واجهات مخصص.</p>
+                </div>
+              </div>
+
+              <div class="status-row">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>إدارة الحالة</strong>
+                  <p>Riverpod عبر Controllers وProviders موزعة بشكل واضح.</p>
+                </div>
+              </div>
+
+              <div class="status-row">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>الاتصال بالخادم</strong>
+                  <p>Dio مع إضافة التوكن تلقائيًا ومعالجة أخطاء مركزية.</p>
+                </div>
+              </div>
+
+              <div class="status-row">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>Realtime</strong>
+                  <p>Socket.IO للتحديثات الفورية الخاصة بالطلبات والتنبيهات.</p>
+                </div>
+              </div>
+
+              <div class="status-row">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>الخرائط</strong>
+                  <p>Google Maps داخل التطبيق مع خدمة Launch مركزية للملاحة الخارجية.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h3>8. المخاطر الحالية</h3>
+                <p>نقاط قد تؤثر على التشغيل الإنتاجي إذا لم تغلق.</p>
+              </div>
+            </div>
+
+            <ul class="note-list">
+              <li>غياب FCM يجعل الإشعارات الخلفية غير مكتملة حتى الآن.</li>
+              <li>غياب release signing يمنع جاهزية النشر الرسمي.</li>
+              <li>الاعتماد على عنوان LAN في بيئة التطوير لا يكفي للإنتاج.</li>
+              <li>عدم وجود Route حقيقي يقلل دقة ETA وتجربة التتبع.</li>
+              <li>توحيد payload الإحداثيات من الباكند ما زال مطلوبًا.</li>
+            </ul>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <div>
+                <h3>9. التوصيات القادمة</h3>
+                <p>أفضل ترتيب عملي للخطوات التالية.</p>
+              </div>
+              <span class="badge warning">الأولوية القادمة</span>
+            </div>
+
+            <div class="timeline">
+              <article class="timeline-item">
+                <h4>أولوية 1</h4>
+                <p>إكمال Firebase Cloud Messaging Native والإشعارات الحقيقية.</p>
+              </article>
+
+              <article class="timeline-item">
+                <h4>أولوية 2</h4>
+                <p>ربط Directions API أو مزود Routing حقيقي بدل الخط المستقيم الحالي.</p>
+              </article>
+
+              <article class="timeline-item">
+                <h4>أولوية 3</h4>
+                <p>إضافة اختيار تطبيق الخرائط من Bottom Sheet داخل التطبيق عند الحاجة.</p>
+              </article>
+
+              <article class="timeline-item">
+                <h4>أولوية 4</h4>
+                <p>تثبيت مفاتيح الخرائط والإعدادات النهائية للإصدار الرسمي.</p>
+              </article>
+
+              <article class="timeline-item">
+                <h4>أولوية 5</h4>
+                <p>توحيد بنية بيانات الإحداثيات من الخادم لتقليل الـ fallbacks.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="footer-note">
+            <strong>الخلاصة:</strong>
+            المشروع الآن في وضع أفضل من قبل، خصوصًا في استقرار الاتصال وميزة
+            الخرائط. الوظائف الأساسية تعمل، وتم تحسين فتح الملاحة بشكل ملموس،
+            لكن الإطلاق الإنتاجي الكامل ما زال يتطلب إكمال
+            <strong>FCM</strong> و<strong>Route حقيقي</strong> وتهيئة
+            <strong>release</strong> النهائية.
+          </section>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
